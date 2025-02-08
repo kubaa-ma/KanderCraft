@@ -1,0 +1,217 @@
+#include <raylib.h>
+#include "block.h"
+#include <stdio.h>
+#include "world.h"
+#include <math.h>
+
+
+#define vyska_sveta 10
+#define delka_sveta 148
+#define sirka_sveta 148
+
+#define WIDTH 1748
+#define HEIGHT 988
+
+Vector3 NormalizeVector(Vector3 v)
+{
+    float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (length == 0.0f) return (Vector3){ 0, 0, 0 };
+    return (Vector3){ v.x / length, v.y / length, v.z / length };
+}
+
+void DrawCameraDirection(Vector3 direction)
+{
+    char dirText[64];
+    sprintf(dirText, "Dir: X=%.2f, Y=%.2f, Z=%.2f", 
+            direction.x, direction.y, direction.z);
+    DrawText(dirText, 10, 30, 20, DARKGRAY);
+}
+int main()
+{
+    float pos = 2;
+    int xPos;
+    int yPos;
+    int zPos;
+    int b_pos = 3;
+    int state = 0;
+    int t = 1;
+    char souradnice[68];
+    float camera_height = 5.75f; 
+    int world[vyska_sveta][delka_sveta][sirka_sveta];
+    world_generator_hi_hi(world);
+    float sour_x[sirka_sveta];
+    float sour_y[vyska_sveta];
+    float sour_z[delka_sveta];
+
+    for (int z = 0; z < delka_sveta - 1; z++) {
+        for (int y = 0; y < vyska_sveta - 1; y++) {
+            for (int x = 0; x < sirka_sveta - 1; x++) {
+                sour_x[x] = x;
+                sour_y[y] = y;
+                sour_z[z] = z;
+            }
+        }
+    }
+
+    InitWindow(WIDTH, HEIGHT, "KanderCraft");
+
+    Texture2D texture_block_top = LoadTexture("textu/texture1.png");
+    Texture2D texture_block_site = LoadTexture("textu/texture2.png");
+    Texture2D texture_block_bottom = LoadTexture("textu/texture3.png");
+    Texture2D texture_block_site1 = LoadTexture("textu/texture4.png");
+    Texture2D texture_block_site2 = LoadTexture("textu/texture5.png");
+    Texture2D texture_block_site3 = LoadTexture("textu/texture6.png");
+    Texture2D texture_backgnound = LoadTexture("textu/background.png");
+    Texture2D texture_dirt_dark = LoadTexture("textu/texture3_dark.png");
+    Texture2D texture_dirt_darker = LoadTexture("textu/texture3_darker.png");
+    Texture2D texture_cobblestone = LoadTexture("textu/cobblestone1.png");
+    Texture2D texture_cobblestone_dark = LoadTexture("textu/cobblestone2.png");
+    Texture2D texture_cobblestone_darker = LoadTexture("textu/cobblestone.png");
+
+    Mesh rectangleMesh = GenMeshPlane(10, 10, 16, 16);
+    Model rectangleModel = LoadModelFromMesh(rectangleMesh); // Vytvoření modelu z mesh
+    Font font_regular = LoadFont("textu/minecraft_font.ttf");
+
+    Camera camera = { 0 };
+    camera.position = (Vector3){ 5.0f, 5.75f, 5.0f };
+    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f }; 
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f }; 
+    camera.fovy = 54.0f;//48.0f
+    camera.projection = CAMERA_PERSPECTIVE;
+
+    Vector2 screenCenter = { GetScreenWidth() / 2.0f, GetScreenHeight() / 2.0f };
+    int reserve = 800;
+    char targetText[64];
+
+    SetTargetFPS(60);
+
+    while (!WindowShouldClose())
+    {
+        Vector2 mousePos = GetMousePosition();
+        if (mousePos.x < screenCenter.x - reserve) {
+            SetMousePosition(screenCenter.x - reserve, mousePos.y);
+        } else if (mousePos.x > screenCenter.x + reserve) {
+            SetMousePosition(screenCenter.x + reserve, mousePos.y);
+        }
+
+        if (mousePos.y < screenCenter.y - reserve) {
+            SetMousePosition(mousePos.x, screenCenter.y - reserve);
+        } else if (mousePos.y > screenCenter.y + reserve) {
+            SetMousePosition(mousePos.x, screenCenter.y + reserve);
+        }
+        if (mousePos.x <= screenCenter.x - reserve || mousePos.x >= screenCenter.x + reserve ||
+            mousePos.y <= screenCenter.y - reserve || mousePos.y >= screenCenter.y + reserve) {
+            SetMousePosition(screenCenter.x, screenCenter.y);
+        }
+        HideCursor();
+       if(state == 0)
+       {
+
+            BeginDrawing();
+            ClearBackground(WHITE);
+            float i = 10;
+
+            
+            DrawTexture(texture_backgnound, 0, 0, WHITE);
+            DrawTextPro(font_regular,"KanderCraft 0.1 - Minecraft Clone by Jakub Jansa (Kander_14) All Rights Reserved 2025 early acces", (Vector2){170, 947}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
+            DrawTextPro(font_regular,"Have Fun!", (Vector2){1248, 58-10}, (Vector2){0,0}, i, 38, 2.0f, YELLOW);
+            DrawTextPro(font_regular,"Play - [ENTER]", (Vector2){WIDTH / 2 - 248, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
+
+            if (IsKeyPressed(KEY_ENTER)){
+                state = 1;
+            }
+        
+            EndDrawing();
+       }
+       else if(state == 1)
+       {
+            Vector3 direction = (Vector3){ 
+                camera.target.x - camera.position.x,
+                camera.target.y - camera.position.y,
+                camera.target.z - camera.position.z
+            };
+            Vector3 normalizedDirection = NormalizeVector(direction);
+
+            SetWindowState(FLAG_BORDERLESS_WINDOWED_MODE);
+            UpdateCamera(&camera, CAMERA_FIRST_PERSON);
+
+            BeginDrawing();
+
+            ClearBackground((Color){135, 208, 234, 100});
+
+            BeginMode3D(camera);  
+            block(&rectangleModel, texture_block_top, texture_block_site, texture_block_bottom, texture_block_site1,
+            texture_block_site2, texture_block_site3, &pos, world, sour_x, sour_y, sour_z,texture_dirt_dark, texture_dirt_darker, 
+            texture_cobblestone, texture_cobblestone_dark, texture_cobblestone_darker, camera.target, camera.position, direction);
+            //DrawGrid(48, 1);        
+
+            EndMode3D();
+            Vector3 camPos = camera.position;
+
+            xPos = (int)camPos.x;
+            yPos = (int)camPos.y;
+            zPos = (int)camPos.z;
+
+            if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
+                if(xPos>=sirka_sveta){
+                    xPos = sirka_sveta;
+                }
+                if(zPos>=delka_sveta){
+                    zPos = delka_sveta;
+                }
+                world[b_pos][zPos][xPos] = 0;
+            }
+            if(IsMouseButtonDown(MOUSE_BUTTON_RIGHT)){
+                if(t == 1){
+                world[b_pos][zPos][xPos] = 2;}
+                else if(t == 2){
+                world[b_pos][zPos][xPos] = 3;}
+            }
+
+            if(GetMouseWheelMove()){
+                if(t == 1){
+                    t = 2;
+                }
+                else if(t == 2){
+                    t = 1;
+                }
+            }
+            if(IsKeyPressed(KEY_U)){
+                b_pos+=1;
+            }
+            if(IsKeyPressed(KEY_L)){
+                b_pos-=1;
+            }
+            if(t == 1){
+                DrawTextPro(font_regular,"\n\n\n\n\n\n\n\n\nBlock: Dirt", (Vector2){10, 10}, (Vector2){0,0}, 0, 28, 2.0f, YELLOW);
+            }
+            else if(t == 2){
+            DrawTextPro(font_regular,"\n\n\n\n\n\n\n\n\nBlock: cobblestone", (Vector2){10, 10}, (Vector2){0,0}, 0, 28, 2.0f, YELLOW);
+
+            }
+    
+            DrawTextPro(font_regular,"KanderCraft 0.1 Jakub Jansa\nMinecraft Clone\n\nLeft Button break a block\nRight button place block(mouse wheel to switch block)\n u/l set upper or lower y axis but if you cross hight 10 you will be off the array and the game  will crash\nThe block is placed under the player\nBlock placing mechanism will be fix in new version\nYou can look inside the block and see the optimalisation :)", (Vector2){10, 10}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
+            sprintf(souradnice, "\n\n\n\n\n\n\n\n\n\nx.%f\tz.%f", camera.position.x, camera.position.z);
+            DrawTextPro(font_regular,souradnice, (Vector2){10, 10}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
+
+            EndDrawing();
+        
+        }
+
+           
+    }    
+    UnloadModel(rectangleModel);
+            UnloadTexture(texture_block_top);
+            UnloadTexture(texture_block_site);
+            UnloadTexture(texture_block_bottom);
+            UnloadTexture(texture_backgnound);
+            UnloadTexture(texture_dirt_dark);
+            UnloadTexture(texture_dirt_darker);
+            UnloadTexture(texture_cobblestone);
+            UnloadTexture(texture_cobblestone_dark);
+            UnloadTexture(texture_cobblestone_darker);
+
+        CloseWindow();  
+
+    return 0;
+}
