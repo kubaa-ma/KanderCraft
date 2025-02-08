@@ -1,0 +1,2 @@
+gcc main.c block.c world.c -o main.exe -lraylib -lopengl32 -lgdi32 -lwinmm
+
