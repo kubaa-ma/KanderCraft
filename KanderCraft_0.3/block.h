@@ -2,7 +2,7 @@
 #ifndef BLOCK_H
 #define BLOCK_H
 
-#define vyska_sveta 10
+#define vyska_sveta 20
 #define delka_sveta 148
 #define sirka_sveta 148
 

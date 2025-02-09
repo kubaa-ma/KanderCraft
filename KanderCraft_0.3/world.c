@@ -4,32 +4,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define vyska_sveta 10
+#include "stb_perlin.h"
+#define STB_PERLIN_IMPLEMENTATION
+
+#define vyska_sveta 20
 #define delka_sveta 148
 #define sirka_sveta 148
 
 
-void world_generator_hi_hi(int world[vyska_sveta][delka_sveta][sirka_sveta]){
+float perlin_noise(float x, float z) {
+    return stb_perlin_noise3(x * 0.1f, z * 0.1f, 0.0f, 0, 0, 0) * 0.5f + 0.5f;
+}
 
-    for(int y = 0; y < vyska_sveta - 1; y++){
-        for(int x = 0; x < sirka_sveta - 1; x++){
-            for(int z = 0; z < delka_sveta - 1; z++){
+void world_generator_hi_hi(int world[vyska_sveta][delka_sveta][sirka_sveta]) {
+    for (int x = 0; x < sirka_sveta-1; x++) {
+        for (int z = 0; z < delka_sveta-1; z++) {
+            int terrainHeight = (int)(perlin_noise(x, z) * (vyska_sveta - 4)) + 4;
 
-                world[y][x][z] = 2;
-                world[vyska_sveta - 7][x][z] = 1;
-
-                world[vyska_sveta - 1][x][z] = 0;
-                world[vyska_sveta - 2][x][z] = 0;
-                world[vyska_sveta - 3][x][z] = 0;
-                world[vyska_sveta - 4][x][z] = 0;
-                world[vyska_sveta - 5][x][z] = 0;
-                world[vyska_sveta - 6][x][z] = 0;
-
-
-                world[0][x][z] = 0;
-                world[1][x][z] = 3;
-
+            for (int y = 0; y < vyska_sveta-1; y++) {
+                if (y > terrainHeight) {
+                    world[y][x][z] = 0; // Vzduch
+                } else if (y == terrainHeight) {
+                    world[y][x][z] = 1; // Tráva
+                } else if (y > terrainHeight - 3) {
+                    world[y][x][z] = 2; // Hlína
+                } else {
+                    world[y][x][z] = 3; // Kámen
+                }
             }
+            world[0][x][z] = 0;
+
         }
     }
 }
+

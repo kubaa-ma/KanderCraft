@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define vyska_sveta 10
+#define vyska_sveta 20
 #define delka_sveta 148
 #define sirka_sveta 148
 #define M_PI 3.14159265358979323846
@@ -32,6 +32,9 @@ void block(Model *model, Texture2D texture_top, Texture2D texture_site, Texture2
     Model rectangleModel = LoadModelFromMesh(rectangleMesh);
 
     Vector3 blockSize = (Vector3){velikost, velikost, velikost};
+
+    //if(world[(int) position.y - 1][(int) position.x][(int) position.z] == 1 || world[(int) position.y - 1][(int) position.x][(int) position.z] == 2 || world[(int) position.y - 1][(int) position.x][(int) position.z] == 3){
+    //}
     //optimalizace vykreslovani
     int pos_y_opti = 0;
     int pos_x_opti = 0;
@@ -46,7 +49,6 @@ void block(Model *model, Texture2D texture_top, Texture2D texture_site, Texture2
         pos_y_opti = 0;
     }
 
-        printf("%f\n", angle_deg_x);
 
     int i = 1;
     int e = 0;        
