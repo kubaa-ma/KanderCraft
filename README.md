@@ -7,7 +7,7 @@ KanderCraft is a simple Minecraft clone created in C using the Raylib library. T
   - `1` = Grass
   - `2` = Dirt
   - `3` = Stone
-  - 
+  
 
 
 ## Controls:
