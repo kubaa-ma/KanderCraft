@@ -10,6 +10,6 @@
 #define DELKA_SVETA 148
 #define SIRKA_SVETA 148
 
-void world_generator_hi_hi(int world[VYSKA_SVETA][DELKA_SVETA][SIRKA_SVETA]);
+void world_generator_hi_hi(int world[VYSKA_SVETA][DELKA_SVETA][SIRKA_SVETA], int inputValue);
 
 #endif

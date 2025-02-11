@@ -12,14 +12,20 @@
 #define sirka_sveta 148
 
 
-float perlin_noise(float x, float z) {
-    return stb_perlin_noise3(x * 0.1f, z * 0.1f, 0.0f, 0, 0, 0) * 0.5f + 0.5f;
-}
 
-void world_generator_hi_hi(int world[vyska_sveta][delka_sveta][sirka_sveta]) {
+float perlin_noise(float x, float z, int inputValue) {
+    return stb_perlin_noise3((x + inputValue) * 0.074f, (z + inputValue) * 0.07f, 0.0f, 0, 0, 0) * 0.5f + 0.5f;
+
+}
+void world_generator_hi_hi(int world[vyska_sveta][delka_sveta][sirka_sveta], int inputValue) {
+
+
+
+
+
     for (int x = 0; x < sirka_sveta-1; x++) {
         for (int z = 0; z < delka_sveta-1; z++) {
-            int terrainHeight = (int)(perlin_noise(x, z) * (vyska_sveta - 4)) + 4;
+            int terrainHeight = (int)(perlin_noise(x, z, inputValue) * (vyska_sveta - 4)) + 4;
 
             for (int y = 0; y < vyska_sveta-1; y++) {
                 if (y > terrainHeight) {

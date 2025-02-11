@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include "world.h"
 #include <math.h>
+#include <stdlib.h>
 #define M_PI 3.14159265358979323846
+#define MAX_DIGITS 10
 
 #define vyska_sveta 20
 #define delka_sveta 148
@@ -58,10 +60,12 @@ int main()
     char souradnice[68];
     float camera_height = 5.75f; 
     int world[vyska_sveta][delka_sveta][sirka_sveta];            
-    world_generator_hi_hi(world);
     float sour_x[sirka_sveta];
     float sour_y[vyska_sveta];
     float sour_z[delka_sveta];
+    char inputText[MAX_DIGITS + 1] = "";
+    int letterCount = 0;
+    int inputValue = 0;
     //-------------------------//
 
     for (int z = 0; z < delka_sveta - 1; z++) { //load coordiation
@@ -159,8 +163,7 @@ int main()
         DrawTextPro(font_regular,"KanderCraft 0.4 - Minecraft Clone by Jakub Jansa (Kander_14) All Rights Reserved 2025 early acces", (Vector2){170, 947}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
         DrawTextPro(font_regular,"A. Generate New world\nB.Play Last world \n(To save the world save the file world.dat", (Vector2){WIDTH / 2 - 248, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
         if(IsKeyPressed(KEY_A)){
-        world_generator_hi_hi(world);
-        state = 1;
+        state = 3;
         }
         if(IsKeyPressed(KEY_B)){
         load_world(world);
@@ -170,6 +173,65 @@ int main()
 
 
        }
+       else if(state == 3){
+        BeginDrawing();
+        ClearBackground(WHITE);
+        DrawTexture(texture_backgnound, 0, 0, WHITE);
+        DrawTextPro(font_regular,"KanderCraft 0.4 - Minecraft Clone by Jakub Jansa (Kander_14) All Rights Reserved 2025 early acces", (Vector2){170, 947}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
+        DrawTextPro(font_regular,"Generating Seed: ", (Vector2){WIDTH / 2 - 248, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
+
+        int key = GetCharPressed();
+
+        while (key > 0) {
+            if ((key >= '0' && key <= '9') && (letterCount < MAX_DIGITS-1)) {
+                inputText[letterCount] = (char)key;
+                letterCount++;
+                inputText[letterCount] = '\0';
+            }
+            key = GetCharPressed();
+        }
+
+        if (IsKeyPressed(KEY_BACKSPACE)) {
+            if (letterCount > 0) {
+                letterCount--;
+                inputText[letterCount] = '\0';
+            }
+        }
+
+        inputValue = (letterCount > 0) ? atoi(inputText) : 0;
+
+        DrawText(inputText, 50, 130, 20, BLACK);
+        DrawRectangleLines(45, 125, 250, 30, BLACK);
+        
+        char outputText[50];
+        sprintf(outputText, "\nValue: %d", inputValue);
+        DrawTextPro(font_regular,outputText, (Vector2){WIDTH / 2 - 248, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
+        EndDrawing();
+        if(IsKeyPressed(KEY_ENTER)){
+            if(inputValue != 69){
+            world_generator_hi_hi(world, inputValue);
+            state = 1;}
+
+            else{
+                state = 4;
+            }
+        }    
+        }
+        else if(state == 4){
+            BeginDrawing();
+            ClearBackground(WHITE);
+            DrawTexture(texture_backgnound, 0, 0, WHITE);
+            DrawTextPro(font_regular,"KanderCraft 0.4 - Minecraft Clone by Jakub Jansa (Kander_14) All Rights Reserved 2025 early acces", (Vector2){170, 947}, (Vector2){0,0}, 0, 28, 2.0f, WHITE);
+            DrawTextPro(font_regular,"\nO_O", (Vector2){WIDTH / 2 - 188, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
+            DrawTextPro(font_regular,"\n\n\n Press to continue [E]", (Vector2){WIDTH / 2 - 248, HEIGHT / 2}, (Vector2){10,0}, 0, 47, 2.0f, WHITE);
+
+            if(IsKeyPressed(KEY_E)){
+                world_generator_hi_hi(world, inputValue);
+                state = 1;
+            }
+            EndDrawing();
+        }
+       
        else if(state == 1)
        {    
             Vector3 direction = (Vector3){ 
