@@ -28,7 +28,9 @@ KanderCraft is a simple Minecraft clone created in C using the Raylib library. T
 
 ## Development Time:
 - The game was developed in one day of programming time.
+  
 ![Snímek obrazovky 2025-02-09 202408](https://github.com/user-attachments/assets/511d0b45-2018-4bec-a001-7fe18b383833)
+![image](https://github.com/user-attachments/assets/27c80bf1-e196-49ce-aed0-1aeb4cde767c)
 ![Snímek obrazovky 2025-02-09 201931](https://github.com/user-attachments/assets/10432d20-a783-43da-bf47-654547b5ca0f)
 ![Snímek obrazovky 2025-02-09 202519](https://github.com/user-attachments/assets/eb73270b-50a4-4446-a982-03c0b3af1528)
 
