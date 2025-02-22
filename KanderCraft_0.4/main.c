@@ -1,3 +1,4 @@
+/*This project is licensed under the MIT License Jakub Jansa 2025 (C)*/
 #include <raylib.h>
 #include "block.h"
 #include <stdio.h>
